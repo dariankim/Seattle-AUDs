@@ -10,8 +10,8 @@ var config = {
     theme: 'dark',
     use3dTerrain: false, //set true for enabling 3D maps.
     auto: false,
-    title: 'AADU & DADU',
-    subtitle: 'Seattle housing info',
+    title: 'Seattle\'s ADUs',
+    subtitle: 'Understanding ADU Density in Seattle\'s City Council Districts',
     byline: 'By Darian Kim and Mausom Tamang',
     footer: 'Images, Articles, and Data Files: <a href="https://docs.google.com/document/d/1vOAkrveFk1JNAMXfPMt8aK4sLqt-6lSkvgUSqkOFg2w/edit?usp=sharing" target="_blank">Sources</a>  <br> Created using <a href="https://github.com/mapbox/storytelling" target="_blank">Mapbox Storytelling</a> template.',
     chapters: [
@@ -303,6 +303,59 @@ var config = {
         },
         {
             id: 'Chapter6',
+            alignment: 'Center',
+            hidden: false,
+            description: `This bar graph shows the total amount of ADUs in each City Council District. 
+            The highest AADU count is in district 5 with 1405 total. The lowest AADU count is in district 7 with 319 total.`,
+            image: 'image/ADU_count.png',
+            location: {
+                center: [-122.3328, 47.6061],
+                zoom: 10,
+                pitch: 0,
+                bearing: 0.00
+            },
+            mapAnimation: 'flyTo',
+            rotateAnimation: false,
+            callback: '',
+            onChapterEnter: [
+                {
+                    layer: 'city-limits',
+                    opacity: 0
+                },
+                {
+                    layer: 'council-district-layer',
+                    opacity: 1
+                },
+                {
+                    layer: 'DADU-extrusion-layer',
+                    opacity: 0
+                },
+                {
+                    layer: 'AADU-extrusion-layer',
+                    opacity: 0
+                },
+                {
+                    layer: 'ADU-extrusion-layer',
+                    opacity: 0
+                },
+                {
+                    layer: 'daduHeatmap',
+                    opacity: 0
+                },
+                {
+                    layer: 'aaduHeatmap',
+                    opacity: 0
+                }
+            ],
+            onChapterExit: [
+                {
+                    layer: 'council-district-layer',
+                    opacity: 0
+                }   
+            ]
+        },
+        {
+            id: 'Chapter7',
             alignment: 'left',
             hidden: false,
             title: "City Council District AADUs",
@@ -354,21 +407,12 @@ var config = {
             ]
         },
         {
-            id: 'Chapter 7',
+            id: 'Chapter8',
             alignment: 'Center',
             hidden: false,
-            title: "City Council District AADU Count",
             description: `This bar graph shows the total amount of AADUs in each City Council District. 
-            The highest AADU count is in district 6 with 732 total. The lowest AADU count is in district 7 with 214 total`,
-            chartdata: [
-                {group: "District 1", value: 602},
-                {group: "District 2", value: 578},
-                {group: "District 3", value: 495},
-                {group: "District 4", value: 540},
-                {group: "District 5", value: 670},
-                {group: "District 6", value: 732},
-                {group: "District 7", value: 214}
-            ],
+            The highest AADU count is in district 6 with 732 total. The lowest AADU count is in district 7 with 214 total.`,
+            image: 'image/AADU_count.png',
             location: {
                 center: [-122.3328, 47.6061],
                 zoom: 10,
@@ -416,7 +460,7 @@ var config = {
             ]
         },
         {
-            id: 'Chapter 8',
+            id: 'Chapter9',
             alignment: 'left',
             hidden: false,
             title: "City Council District DADUs",
@@ -468,20 +512,11 @@ var config = {
             ]
         },
         {
-            id: 'Chapter9',
+            id: 'Chapter10',
             alignment: 'Center',
             hidden: false,
-            title: "City Council District DADU Count",
-            description: 'This bar graph shows the total amount of DADUs in each City Council District. The highest DADU count is in district 5 with 735 total. The lowest DADU count is in district 7 with 105 total',
-            chartdata: [
-                {group: "District 1", value: 521},
-                {group: "District 2", value: 416},
-                {group: "District 3", value: 225},
-                {group: "District 4", value: 291},
-                {group: "District 5", value: 735},
-                {group: "District 6", value: 597},
-                {group: "District 7", value: 105}
-            ],
+            description: 'This bar graph shows the total amount of DADUs in each City Council District. The highest DADU count is in district 5 with 735 total. The lowest DADU count is in district 7 with 105 total.',
+            image: 'image/DADU_count.png',
             location: {
                 center: [-122.3328, 47.6061],
                 zoom: 10,
@@ -529,7 +564,7 @@ var config = {
             ]
         },
         {
-            id: 'Chapter10',
+            id: 'Chapter11',
             alignment: 'fully',
             hidden: false,
             title: "Conclusion",

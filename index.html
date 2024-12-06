@@ -117,8 +117,6 @@
             width: 100%;
         } 
 
-
-
         .legend-div {
             padding: 10px;
             box-shadow: 0 1px 2px rgba(0 0 0 0.1);
@@ -145,7 +143,14 @@
             margin-right: 5px;
         }
 
+        .mapboxgl-ctrl-top-right {
+            margin-right: 40px; 
+            margin-top: 900px;  
+        }
 
+        .mapboxgl-ctrl-nav {
+            margin-right: 10px;  
+        }
 
         @media (max-width: 750px) {
             .centered, .lefty, .righty, .fully {
@@ -432,6 +437,23 @@ map.on("load", function() {
     };
 
     map.addLayer({
+        'id': 'council-district-layer',
+        'type': 'fill',
+        'source': {type: 'geojson',
+                        data: 'data/seattle_ADUs.geojson'
+                        },
+        'paint': {
+            'fill-color': ['interpolate',['linear'],['get', 'district'],
+                    1, '#3498db',
+                    2, '#8e44ad',
+                    3, '#f1c40f',
+                    4, '#27ae60',
+                    5, '#c0392b',
+                    6, '#e67e22',
+                    7, '#2e4053']
+        }
+    });
+    map.addLayer({
         'id': 'city-limits',
         'type': 'fill',
         'source': {type: 'geojson',
@@ -534,23 +556,6 @@ map.on("load", function() {
             }
     });
     map.addLayer({
-        'id': 'council-district-layer',
-        'type': 'fill',
-        'source': {type: 'geojson',
-                        data: 'data/seattle_ADUs.geojson'
-                        },
-        'paint': {
-            'fill-color': ['interpolate',['linear'],['get', 'district'],
-                    1, '#3498db',
-                    2, '#8e44ad',
-                    3, '#f1c40f',
-                    4, '#27ae60',
-                    5, '#c0392b',
-                    6, '#e67e22',
-                    7, '#2e4053']
-        }
-    });
-    map.addLayer({
         'id': 'ADU-extrusion-layer',
         'type': 'fill-extrusion',
         'source': {type: 'geojson',
@@ -570,6 +575,7 @@ map.on("load", function() {
             'fill-extrusion-opacity': 0.6
             }
     });
+    
 
 
 
@@ -723,60 +729,47 @@ function updateInsetLayer(bounds) {
     insetMap.getSource('boundsSource').setData(bounds);
 }
 
-// Add zoom and rotation controls to the map.
+// Zoom and rotation interactivity
 map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
-// Create a popup that will display only the district
+// Initialize the popup
 var popup = new mapboxgl.Popup({
-    closeButton: false,  // Hide the close button
-    closeOnClick: false  // Keep the popup open when clicking outside
+    closeButton: false,
+    closeOnClick: false
 });
 
-// Add hover event to show only the district on hover for ADU-extrusion-layer
-map.on('mouseenter', 'ADU-extrusion-layer', function(e) {
-    // Get the features under the mouse pointer
+// Add hover event to show only the district on hover for council-district-layer
+map.on('mouseenter', 'council-district-layer', function(e) {
+    // Get the features under the mouse pointer, strictly from the 'council-district-layer'
     var features = map.queryRenderedFeatures(e.point, {
-        layers: ['ADU-extrusion-layer']
+        layers: ['council-district-layer']
     });
 
-    // If a feature is found, display its district in the popup
-    if (features.length > 0) {
+    // Ensure the feature is from the 'council-district-layer' and check if it's a polygon
+    if (features.length > 0 && features[0].layer.id == 'council-district-layer') {
         var feature = features[0];
         var district = feature.properties.district;
+        var ADU_count = feature.properties.ADU_count;
+        var AADU_count = feature.properties.AADU_count;
+        var DADU_count = feature.properties.AADU_count;
+        var Acres = feature.properties.AREA_ACRES;
 
-        // Set the popup content to only show the district
+        // Set the popup content to show the district number and any other info you want
         popup.setLngLat(e.lngLat)
-            .setHTML(`<strong>District:</strong> ${district}`)
+            .setHTML(`<strong>District:</strong> ${district}<br> <strong>ADU Count</strong>: ${String(ADU_count)}<br> <strong>AADU Count</strong>: ${String(AADU_count)}
+                      <br> <strong>DADU Count</strong>: ${String(DADU_count)}<br> <strong>District Acres</strong>: ${String(Acres)}`)
             .addTo(map);
     }
 });
 
-// Remove the popup when the mouse leaves the ADU layer
-map.on('mouseleave', 'ADU-extrusion-layer', function() {
-    popup.remove();
+// Ensure the cursor changes to a pointer when hovering over the district polygons
+map.on('mouseenter', 'council-district-layer', function() {
+    map.getCanvas().style.cursor = 'pointer';
 });
 
-// Similarly, add hover events for DADU-extrusion-layer to show only the district
-map.on('mouseenter', 'DADU-extrusion-layer', function(e) {
-    // Get the features under the mouse pointer
-    var features = map.queryRenderedFeatures(e.point, {
-        layers: ['DADU-extrusion-layer']
-    });
-
-    // If a feature is found, display its district in the popup
-    if (features.length > 0) {
-        var feature = features[0];
-        var district = feature.properties.district;
-
-        // Set the popup content to only show the district
-        popup.setLngLat(e.lngLat)
-            .setHTML(`<strong>District:</strong> ${district}`)
-            .addTo(map);
-    }
-});
-
-// Remove the popup when the mouse leaves the DADU layer
-map.on('mouseleave', 'DADU-extrusion-layer', function() {
+// Reset the cursor when leaving the layer
+map.on('mouseleave', 'council-district-layer', function() {
+    map.getCanvas().style.cursor = '';
     popup.remove();
 });
 
